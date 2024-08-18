@@ -34,7 +34,7 @@ class StudentController extends Controller
         $student ->student_id = $request->student_id;
         $student -> department = $request->department;
         $student->save();
-        return back()->withSuccess('Product Created!!!!');
+        return back()->withSuccess('Student profile Created successfully!');
     }
 
     public function edit($id){
@@ -61,13 +61,27 @@ class StudentController extends Controller
         $student ->student_id = $request->student_id;
         $student -> department = $request->department;
         $student->save();
-        return back()->withSuccess('Product Updated!!!!');
+        return back()->withSuccess('Student details Updated successfully!');
 
     }
     public function delete($id){
         $student = student::where('id', $id)->first();
         $student->delete();
-        return back()->withSuccess('Product Deleted!!!!');
+        return back()->withSuccess('Student details Deleted successfully!');
     }
+
+    public function search(Request $request)
+    {
+        $query = strtolower($request->input('query'));
+
+        // Search by name, student ID, or department in a case-insensitive way
+        $students = Student::whereRaw('LOWER(name) LIKE ?', ["%{$query}%"])
+            ->orWhereRaw('LOWER(student_id) LIKE ?', ["%{$query}%"])
+            ->orWhereRaw('LOWER(department) LIKE ?', ["%{$query}%"])
+            ->get();
+        // Return the search results to a view (or same index page)
+        return view('students.index', ['students' => $students]);
+    }
+
 
 }
